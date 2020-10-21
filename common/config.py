@@ -1,6 +1,7 @@
 import mysql.connector as mysql
 from passlib.hash import sha256_crypt
 
+data = None
 
 con = mysql.connect(
         host = "localhost",
@@ -12,8 +13,11 @@ con = mysql.connect(
 cursor = con.cursor()
 
 def user_login(nim, passCandidate):
+    global data
     try:
         cursor.execute("SELECT * FROM akun WHERE nim=%s and password=%s", [nim, passCandidate])
-        return cursor.fetchone()
+        data = cursor.fetchone()
+        return data
     except:
         return False
+
