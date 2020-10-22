@@ -1,6 +1,12 @@
 from tkinter import *
+from tkinter import messagebox
 from PIL import ImageTk, Image
+import common.config
+from common.config import user_login, user_register, user_detail, fetch_document, read_data
 
+#global variable
+nim = None
+passCandidate = None
 
 class WelcomeWindow(Frame):
 
@@ -30,7 +36,7 @@ class WelcomeWindow(Frame):
         self.frame.place(x=80, y=50)
 
 
-        self.logo = Image.open('images\\logo-upi-removebg-preview.png')
+        self.logo = Image.open('images\\SAC_big.jpg')
         self.logo2 = self.logo.resize((100,100), Image.ANTIALIAS)
         self.logo3 = ImageTk.PhotoImage(self.logo2)
         
@@ -59,11 +65,12 @@ class WelcomeWindow(Frame):
         app = Toplevel(self.master)
         self.currentWindow = RegisterWindow(app)
 
+
 class LoginWindow(Frame):
     def __init__(self, master):
         self.master = master
-
-        self.master.title("Halaman Login")
+        self.master.iconbitmap("images\\sac_small_GG7_icon.ico")
+        self.master.title("Halaman Masuk")
 
         self.canvas = Canvas(self.master, width=600, height=400, bg='white')
         self.canvas.pack(expand=YES, fill=BOTH)
@@ -82,7 +89,7 @@ class LoginWindow(Frame):
         self.frame = Frame(self.master, height=300, width=450)
         self.frame.place(x=80, y=50)
 
-        self.logo = Image.open('images\\logo-upi-removebg-preview.png')
+        self.logo = Image.open('images\\SAC_big.jpg')
         self.logo2 = self.logo.resize((100,100), Image.ANTIALIAS)
         self.logo3 = ImageTk.PhotoImage(self.logo2)
         
@@ -103,22 +110,40 @@ class LoginWindow(Frame):
         self.passwordEntry = Entry(self.frame, show="*")
         self.passwordEntry.place(x=220, y=180)
 
-        self.submitLogin = Button(self.frame,text="Login")
+        self.submitLogin = Button(self.frame,text="Login", command=self.login)
         self.submitLogin.place(x=250, y=220)
 
         self.registerButton = Button(self.frame, text="Belum Punya Akun? Daftar", command=self.RegisterWindow)
         self.registerButton.place(x=0, y=270)
+    
+    def login(self):
+        global nim
+        global passCandidate
+        nim = self.nimEntry.get()
+        passCandidate = self.passwordEntry.get()
+
+        if user_login(nim, passCandidate):
+            messagebox.showinfo("Login", "Anda Berhasil Masuk")
+            DashboardWindow(self.master)
+        else:
+            return messagebox.showerror("Loginn", "NIM atau Password Anda Salah")
     
     def RegisterWindow(self):
         self.master.withdraw()
         app = Toplevel(self.master)
         self.currentWindow = RegisterWindow(app)
 
+    def DashboardWindow(self):
+        self.master.withdraw()
+        app = Toplevel(self.master)
+        self.currentWindow = DashboardWindow(app)
+
+
 class RegisterWindow(Frame):
     def __init__(self, master):
         self.master = master
-
-        self.master.title("Halaman Login")
+        self.master.iconbitmap("images\\sac_small_GG7_icon.ico")
+        self.master.title("Halaman Pendaftaran")
 
         self.canvas = Canvas(self.master, width=600, height=400, bg='white')
         self.canvas.pack(expand=YES, fill=BOTH)
@@ -166,21 +191,68 @@ class RegisterWindow(Frame):
         self.passwordEntry = Entry(self.frame, show="*")
         self.passwordEntry.place(x=220, y=180)
 
-        self.submitDaftar = Button(self.frame,text="Daftar")
+        self.submitDaftar = Button(self.frame,text="Daftar", command=self.register)
         self.submitDaftar.place(x=250, y=220)
 
         self.loginButton = Button(self.frame, text="Sudah Punya Akun? Masuk", command=self.LoginWindow)
         self.loginButton.place(x=0, y=270)
+
+    def register(self):
+        nama = self.namaEntry.get()
+        nim = self.nimEntry.get()
+        email = self.emailEntrty.get()
+        password = self.passwordEntry.get()
+        verifikasi = False
+
+        if user_register(nama, nim, email, password, verifikasi):
+            messagebox.showinfo("Daftar", "Akun anda berhasil didaftarkan")
+            LoginWindow(self.master)
+        else:
+            return messagebox.showwarning("Daftar", "Terjadi kesalahan saat mendaftarkan akun anda. Silahkan coba lagi.")
     
     def LoginWindow(self):
         self.master.withdraw()
         app = Toplevel(self.master)
         self.currentWindow = LoginWindow(app)
 
-    
 
+class DashboardWindow(Frame):
+    def __init__(self, master):
+        self.master = master
+        self.master.iconbitmap("images\\sac_small_GG7_icon.ico")
+        self.master.title("Halaman Pendaftaran")
 
+        self.canvas = Canvas(self.master, width=600, height=400, bg='white')
+        self.canvas.pack(expand=YES, fill=BOTH)
 
+        #show window in center of the screen
+        width = self.master.winfo_screenwidth()
+        height = self.master.winfo_screenheight()
+        x = int(width / 2 - 600 / 2)
+        y = int(height / 2 - 400 / 2)
+        str1 = "600x400+"+ str(x) + "+" + str(y)
+        self.master.geometry(str1)
 
+        #disable resize of the window
+        self.master.resizable(width=False, height=False)
+
+        self.frame = Frame(self.master, height=300, width=450)
+        self.frame.place(x=80, y=50)
+        
+        user_detail(nim)
+        nama = str(user_detail.nama)
 
         
+        self.welcomeLabel = Label(self.master, text=f"Selamat datang {nama} ", font=("Courier", 12))
+        self.welcomeLabel.place(x=80, y=50)
+
+        self.dokumenTersedia = Label(self.master, text="Dokumen Anda", font=("Courier", 11))
+        self.dokumenTersedia.place(x=80, y=80)
+
+        skripsi = fetch_document(nama)
+        
+        self.judul = Label(self.master, text=skripsi[1][1], font=("Courier", 9))
+        self.judul.place(x=80, y=100)
+
+        self.downloadButton = Button(self.master, text="Download File", font=("Courier", 7), command=lambda: read_data(skripsi[1][5], skripsi[1][1]))
+        self.downloadButton.place(x=80, y=120)

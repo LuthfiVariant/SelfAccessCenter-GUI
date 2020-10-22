@@ -1,11 +1,12 @@
 from tkinter import *
-from Welcome import WelcomeWindow, LoginWindow, RegisterWindow
+from Welcome import WelcomeWindow, LoginWindow, RegisterWindow, DashboardWindow
 
 class App:
 
     def __init__(self):
         self.master = Tk()
-        self.curretWindow = WelcomeWindow(self.master)
+        self.master.iconbitmap("images\\sac_small_GG7_icon.ico")
+        self.curretWindow = LoginWindow(self.master)
 
     def run(self):
         self.master.mainloop()
