@@ -1,5 +1,5 @@
 from tkinter import *
-from Welcome import WelcomeWindow, LoginWindow, RegisterWindow, DashboardWindow
+from Welcome import WelcomeWindow, LoginWindow, RegisterWindow, DashboardWindow, AddWindow
 
 class App:
 

@@ -1,12 +1,14 @@
 from tkinter import *
-from tkinter import messagebox
+from tkinter import messagebox, filedialog
 from PIL import ImageTk, Image
 import common.config
-from common.config import user_login, user_register, user_detail, fetch_document, read_data
+from common.config import user_login, user_register, user_detail, fetch_document, read_data, save_data, simpan_data, hapus_data
+from common.functions import RegisterWindow
 
 #global variable
 nim = None
 passCandidate = None
+nama = None
 
 class WelcomeWindow(Frame):
 
@@ -220,10 +222,10 @@ class DashboardWindow(Frame):
     def __init__(self, master):
         self.master = master
         self.master.iconbitmap("images\\sac_small_GG7_icon.ico")
-        self.master.title("Halaman Pendaftaran")
+        self.master.title("Dashboard")
 
         self.canvas = Canvas(self.master, width=600, height=400, bg='white')
-        self.canvas.pack(expand=YES, fill=BOTH)
+        self.canvas.place(x=0, y=0)
 
         #show window in center of the screen
         width = self.master.winfo_screenwidth()
@@ -236,23 +238,160 @@ class DashboardWindow(Frame):
         #disable resize of the window
         self.master.resizable(width=False, height=False)
 
-        self.frame = Frame(self.master, height=300, width=450)
+        self.frame = Frame(self.master, height=300, width=450, bg='white')
         self.frame.place(x=80, y=50)
         
         user_detail(nim)
+        global nama
         nama = str(user_detail.nama)
 
-        
-        self.welcomeLabel = Label(self.master, text=f"Selamat datang {nama} ", font=("Courier", 12))
-        self.welcomeLabel.place(x=80, y=50)
-
-        self.dokumenTersedia = Label(self.master, text="Dokumen Anda", font=("Courier", 11))
-        self.dokumenTersedia.place(x=80, y=80)
-
         skripsi = fetch_document(nama)
-        
-        self.judul = Label(self.master, text=skripsi[1][1], font=("Courier", 9))
-        self.judul.place(x=80, y=100)
 
-        self.downloadButton = Button(self.master, text="Download File", font=("Courier", 7), command=lambda: read_data(skripsi[1][5], skripsi[1][1]))
-        self.downloadButton.place(x=80, y=120)
+        
+        length = len(skripsi)
+
+        i = 0
+        for i in range(length):
+            jarak = i * 45
+
+
+            id = skripsi[i][0]
+
+            id = id
+
+            print(id)
+
+            judul = skripsi[i][1]
+
+            print(judul)
+
+
+            self.id = Label(self.frame, text=skripsi[i][0])
+            self.id.place(x=80, y=150+jarak)
+            
+            self.judul = Label(self.frame, text=skripsi[i][1])
+            self.judul.place(x=100, y=150+jarak)
+
+            self.penulis = Label(self.frame, text=skripsi[i][2])
+            self.penulis.place(x=100, y=175+jarak)
+
+            self.downloadButton = Button(self.frame, text="Download", command=lambda: read_data(skripsi[i][5]), height=1, width=10)
+            self.downloadButton.place(x=250, y=170+jarak)
+
+            self.editButton = Button(self.frame, text="Edit", command=lambda: self.EditWindow(skripsi[i][1]))
+            self.editButton.place(x=220, y=170+jarak)
+
+        self.tambahSkripsi = Button(self.frame, text="Tambah Skripsi", command=self.AddWindow)
+        self.tambahSkripsi.place(x=100, y=100)
+
+        self.id = Entry(self.frame)
+        self.id.place(x=200, y=100)
+
+        self.hapus = Button(self.frame, text="Hapus", command=self.delete)
+        self.hapus.place(x=300, y=100)
+
+        
+
+    def AddWindow(self):
+        self.master.withdraw()
+        app = Toplevel(self.master)
+        self.currentWindow = AddWindow(app)
+
+    def delete(self):
+        id = self.id.get()
+        if hapus_data(id):
+            messagebox.showinfo("Berhasil", "Data berhasil dihapus")
+        else:
+            messagebox.showerror("Gagal", "Data gagal dihapus")
+
+    
+    
+
+class SuntingWindow(Frame):
+    def __init__(self, master):
+            self.master = master
+            self.master.iconbitmap("images\\sac_small_GG7_icon.ico")
+            self.master.title("Edit Document")
+
+            self.canvas = Canvas(self.master, width=600, height=400, bg='white')
+            self.canvas.place(x=0, y=0)
+
+            #show window in center of the screen
+            width = self.master.winfo_screenwidth()
+            height = self.master.winfo_screenheight()
+            x = int(width / 2 - 600 / 2)
+            y = int(height / 2 - 400 / 2)
+            str1 = "600x400+"+ str(x) + "+" + str(y)
+            self.master.geometry(str1)
+
+            #disable resize of the window
+            self.master.resizable(width=False, height=False)
+
+            self.frame = Frame(self.master, height=300, width=450, bg='white')
+            self.frame.place(x=80, y=50)
+
+            self.judulEdit = Label(self.frame, text=id)
+            self.judulEdit.place(x=100, y=150)
+
+
+class AddWindow(Frame):
+    def __init__(self, master):
+        self.master = master
+        self.master.iconbitmap("images\\sac_small_GG7_icon.ico")
+        self.master.title("Add Document")
+
+        self.canvas = Canvas(self.master, width=600, height=400, bg='white')
+        self.canvas.place(x=0, y=0)
+
+        #show window in center of the screen
+        width = self.master.winfo_screenwidth()
+        height = self.master.winfo_screenheight()
+        x = int(width / 2 - 600 / 2)
+        y = int(height / 2 - 400 / 2)
+        str1 = "600x400+"+ str(x) + "+" + str(y)
+        self.master.geometry(str1)
+
+        #disable resize of the window
+        self.master.resizable(width=False, height=False)
+
+        self.frame = Frame(self.master, height=300, width=450, bg='white')
+        self.frame.place(x=80, y=50)
+
+
+        self.judulAdd = Label(self.frame, text="Judul")
+        self.judulAdd.config(font=("Courier", 12))
+        self.judulAdd.place(x=30, y=20)
+
+        self.judulEntry = Entry(self.frame, width=20)
+        self.judulEntry.place(x=150, y=20)
+
+        self.tahunAdd = Label(self.frame, text="Tahun")
+        self.tahunAdd.config(font=("Courier", 12))
+        self.tahunAdd.place(x=30, y=50)
+
+        self.tahunEntry = Entry(self.frame, width=20)
+        self.tahunEntry.place(x=150, y=50)
+
+        self.abstrakAdd = Label(self.frame, text="abstrak")
+        self.abstrakAdd.config(font=("Courier", 12))
+        self.abstrakAdd.place(x=30, y=80)
+
+        self.abstrakEntry = Text(self.frame, height=10, width=17)
+        self.abstrakEntry.place(x=150, y=80)
+            
+        self.berkasAdd = Button(self.frame, text="Simpan Data", command=self.simpan)
+        self.berkasAdd.config(font=("Courier", 12))
+        self.berkasAdd.place(x=30, y=240)
+
+    def simpan(self):
+        judul = self.judulEntry.get()
+        tahun = self.tahunEntry.get()
+        abstrak = self.abstrakEntry.get('1.0', END)
+        penulis = nama
+        if simpan_data(judul, penulis, tahun, abstrak):
+            messagebox.showinfo("Berhasil", "Data anda berhasil dimasukkan")
+            self.master.withdraw()
+            app = Toplevel(self.master)
+            self.currentWindow = DashboardWindow(app)
+        else:
+            messagebox.showwarning("Gagal", "Data anda gagal dimasukkan. Coba Kembali.")

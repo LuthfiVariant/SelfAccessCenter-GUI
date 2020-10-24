@@ -8,7 +8,7 @@ import os
 con = mysql.connect(
         host = "localhost",
         user = "root",
-        password = "kanaderu",
+        password = "kanaderu", 
         database = "sac"
     )
 
@@ -25,7 +25,7 @@ def user_login(nim, passCandidate):
         else:
             return messagebox.showerror("Login", "Password Anda Salah") 
     except:
-        return False
+        return Tk.destroy()
 
 def user_detail(nim):
     try:
@@ -52,10 +52,22 @@ def fetch_document(nama):
     except:
         return False
 
-def read_data(bytes, filename):
+def read_data(bytes):
     fn = filedialog.asksaveasfilename(initialdir=os.getcwd(), title="Save File", defaultextension=".pdf", filetypes=(("PDF file", "*.pdf"), ("All Files", "*.*")))
 
     with open(fn, "wb") as f:
         f.write(bytes)
     f.close()
     messagebox.showinfo("Success", "Save Successful")
+
+def simpan_data(judul, penulis, tahun, abstrak):
+        berkas = filedialog.askopenfilename(title="Select File", filetypes=(("PDF files", "*.pdf"), ("All Files", "*.*")))
+        with open(berkas, "rb") as f:
+            data = f.read()
+        cursor.execute("INSERT INTO skripsi(judul, penulis, tahun, abstrak, berkas) VALUES(%s,%s,%s,%s,%s)", [judul, penulis, tahun, abstrak, data])
+        return True
+
+def hapus_data(id):
+    cursor.execute("DELETE FROM skripsi WHERE id = %s", [id])
+    return True
+
