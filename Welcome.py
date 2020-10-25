@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import messagebox, filedialog
 from PIL import ImageTk, Image
 import common.config
-from common.config import user_login, user_register, user_detail, fetch_document, read_data, save_data, simpan_data, hapus_data
+from common.config import user_login, user_register, user_detail, fetch_document, read_data, simpan_data, hapus_data, edit_data, update_data
 from common.functions import RegisterWindow
 
 #global variable
@@ -278,9 +278,6 @@ class DashboardWindow(Frame):
             self.downloadButton = Button(self.frame, text="Download", command=lambda: read_data(skripsi[i][5]), height=1, width=10)
             self.downloadButton.place(x=250, y=170+jarak)
 
-            self.editButton = Button(self.frame, text="Edit", command=lambda: self.EditWindow(skripsi[i][1]))
-            self.editButton.place(x=220, y=170+jarak)
-
         self.tambahSkripsi = Button(self.frame, text="Tambah Skripsi", command=self.AddWindow)
         self.tambahSkripsi.place(x=100, y=100)
 
@@ -290,7 +287,66 @@ class DashboardWindow(Frame):
         self.hapus = Button(self.frame, text="Hapus", command=self.delete)
         self.hapus.place(x=300, y=100)
 
-        
+        self.editButton = Button(self.frame, text="Edit", command=self.edit)
+        self.editButton.place(x=350, y=100)
+
+    def edit(self):
+        editor = Toplevel(self.master)
+        editor.title("Edit Berkas")
+
+
+        width = editor.winfo_screenwidth()
+        height = editor.winfo_screenheight()
+        x = int(width / 2 - 600 / 2)
+        y = int(height / 2 - 400 / 2)
+        str1 = "600x400+"+ str(x) + "+" + str(y)
+        editor.geometry(str1)
+
+        edit_data(self.id.get())
+
+        data = edit_data.data
+
+        self.judulEdit = Label(editor, text="Judul")
+        self.judulEdit.config(font=("Courier", 12))
+        self.judulEdit.place(x=30, y=20)
+
+        self.judulEntry = Entry(editor, width=20)
+        self.judulEntry.place(x=150, y=20)
+
+        self.tahunEdit = Label(editor, text="Tahun")
+        self.tahunEdit.config(font=("Courier", 12))
+        self.tahunEdit.place(x=30, y=50)
+
+        self.tahunEntry = Entry(editor, width=20)
+        self.tahunEntry.place(x=150, y=50)
+
+        self.abstrakEdit = Label(editor, text="abstrak")
+        self.abstrakEdit.config(font=("Courier", 12))
+        self.abstrakEdit.place(x=30, y=80)
+
+        self.abstrakEntry = Text(editor, height=10, width=17)
+        self.abstrakEntry.place(x=150, y=80)
+            
+        self.berkasEdit = Button(editor, text="Simpan Data", command=self.update)
+        self.berkasEdit.config(font=("Courier", 12))
+        self.berkasEdit.place(x=30, y=240)
+
+
+        for record in data:
+            self.judulEntry.insert(0, record[1])
+            self.tahunEntry.insert(0, record[3])
+            self.abstrakEntry.insert('1.0', record[4])
+
+    def update(self):
+        id = self.id.get()
+        judul = self.judulEntry.get()
+        penulis = nama
+        tahun = self.tahunEntry.get()
+        abstrak = self.abstrakEntry.get('1.0', END)
+        if update_data(id, judul, penulis, tahun, abstrak):
+            messagebox.showinfo("Berhasil", "Data berhasil di-edit")
+        else:
+            messagebox.showwarning("Gagal", "Data gagal di-edit")
 
     def AddWindow(self):
         self.master.withdraw()
@@ -303,35 +359,6 @@ class DashboardWindow(Frame):
             messagebox.showinfo("Berhasil", "Data berhasil dihapus")
         else:
             messagebox.showerror("Gagal", "Data gagal dihapus")
-
-    
-    
-
-class SuntingWindow(Frame):
-    def __init__(self, master):
-            self.master = master
-            self.master.iconbitmap("images\\sac_small_GG7_icon.ico")
-            self.master.title("Edit Document")
-
-            self.canvas = Canvas(self.master, width=600, height=400, bg='white')
-            self.canvas.place(x=0, y=0)
-
-            #show window in center of the screen
-            width = self.master.winfo_screenwidth()
-            height = self.master.winfo_screenheight()
-            x = int(width / 2 - 600 / 2)
-            y = int(height / 2 - 400 / 2)
-            str1 = "600x400+"+ str(x) + "+" + str(y)
-            self.master.geometry(str1)
-
-            #disable resize of the window
-            self.master.resizable(width=False, height=False)
-
-            self.frame = Frame(self.master, height=300, width=450, bg='white')
-            self.frame.place(x=80, y=50)
-
-            self.judulEdit = Label(self.frame, text=id)
-            self.judulEdit.place(x=100, y=150)
 
 
 class AddWindow(Frame):

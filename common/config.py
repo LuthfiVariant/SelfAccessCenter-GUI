@@ -71,3 +71,15 @@ def hapus_data(id):
     cursor.execute("DELETE FROM skripsi WHERE id = %s", [id])
     return True
 
+def edit_data(id):
+    cursor.execute("SELECT * FROM skripsi WHERE id = %s", [id])
+
+    edit_data.data = cursor.fetchall()
+    return True
+
+def update_data(id, judul, penulis, tahun, abstrak):
+    berkas = filedialog.askopenfilename(title="Select File", filetypes=(("PDF files", "*.pdf"), ("All Files", "*.*")))
+    with open(berkas, "rb") as f:
+        data = f.read()
+    cursor.execute("UPDATE skripsi SET judul=%s, penulis=%s, tahun=%s, abstrak=%s, berkas=%s WHERE id = %s", [judul, penulis, tahun, abstrak, data, id])
+    return True
